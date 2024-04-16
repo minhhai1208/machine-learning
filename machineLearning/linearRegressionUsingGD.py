@@ -3,6 +3,8 @@ from __future__ import division, print_function, unicode_literals
 import numpy as np
 import matplotlib
 import matplotlib.pyplot as plt
+import cv2
+import pandas
 np.random.seed(2)
 X = np.random.rand(1000, 1)
 y = 4 + 3 * X + .2*np.random.randn(1000, 1) # noise added
@@ -72,6 +74,6 @@ def myGD(w_init, grad, eta):
         w.append(w_new)
     return (w, it)
 
-w_init = np.array([[2], [1]])
-(w1, it1) = myGD(w_init, grad, 1)
-print('Solution found by GD: w = ', w1[-1].T, ',\nafter %d iterations.' %(it1+1))
+
+
+

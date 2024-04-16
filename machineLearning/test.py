@@ -1,122 +1,84 @@
-class TrieNode():
-    def __init__(self):
-        # Initialising one node for trie
-        self.children = {}
-        self.last = False
+# A Python3 program for Prim's Minimum Spanning Tree (MST) algorithm.
+# The program is for adjacency matrix representation of the graph
+
+import sys  # Library for INT_MAX
 
 
-class Trie():
-    def __init__(self):
+class Graph():
 
-        # Initialising the trie structure.
-        self.root = TrieNode()
+    def __init__(self, vertices):
+        self.V = vertices
+        self.graph = [[0 for column in range(vertices)]
+                      for row in range(vertices)]
 
-    def formTrie(self, keys):
+    # A utility function to print the constructed MST stored in parent[]
+    def printMST(self, parent):
+        print("Edge \tWeight")
+        for i in range(1, self.V):
+            print(parent[i], "-", i, "\t", self.graph[i][parent[i]])
 
-        # Forms a trie structure with the given set of strings
-        # if it does not exists already else it merges the key
-        # into it by extending the structure as required
-        for key in keys:
+    # A utility function to find the vertex with
+    # minimum distance value, from the set of vertices
+    # not yet included in shortest path tree
+    def minKey(self, key, mstSet):
 
-            self.insert(key)  # inserting one key to the trie.
+        # Initialize min value
+        min = sys.maxsize
 
-    def insert(self, key):
+        for v in range(self.V):
+            if key[v] < min and mstSet[v] == False:
+                min = key[v]
+                min_index = v
 
-        # Inserts a key into trie if it does not exist already.
-        # And if the key is a prefix of the trie node, just
-        # marks it as leaf node.
-        node = self.root
+        return min_index
 
-        for a in key:
-            if not node.children.get(a):
-                node.children[a] = TrieNode()
+    # Function to construct and print MST for a graph
+    # represented using adjacency matrix representation
+    def primMST(self):
 
-            node = node.children[a]
+        # Key values used to pick minimum weight edge in cut
+        key = [sys.maxsize] * self.V
+        parent = [None] * self.V  # Array to store constructed MST
+        # Make key 0 so that this vertex is picked as first vertex
+        key[0] = 0
+        mstSet = [False] * self.V
 
-        node.last = True
+        parent[0] = -1  # First node is always the root of
 
-    def suggestionsRec(self, node, word):
+        for cout in range(self.V):
 
-        # Method to recursively traverse the trie
-        # and return a whole word.
-        if node.last:
+            # Pick the minimum distance vertex from
+            # the set of vertices not yet processed.
+            # u is always equal to src in first iteration
+            u = self.minKey(key, mstSet)
 
-            print(word)
+            # Put the minimum distance vertex in
+            # the shortest path tree
+            mstSet[u] = True
 
-        for a, n in node.children.items():
+            # Update dist value of the adjacent vertices
+            # of the picked vertex only if the current
+            # distance is greater than new distance and
+            # the vertex in not in the shortest path tree
+            for v in range(self.V):
 
-            self.suggestionsRec(n, word + a)
+                # graph[u][v] is non zero only for adjacent vertices of m
+                # mstSet[v] is false for vertices not yet included in MST
+                # Update the key only if graph[u][v] is smaller than key[v]
+                if self.graph[u][v] > 0 and mstSet[v] == False and key[v] > self.graph[u][v]:
+                    key[v] = self.graph[u][v]
+                    parent[v] = u
 
-
-    def printAutoSuggestions(self, key):
-
-        # Returns all the words in the trie whose common
-        # prefix is the given key thus listing out all
-        # the suggestions for autocomplete.
-        node = self.root
-        i = 0
-        if not node.children.get(key[0]):
-            return 1
-        for a in key:
-            # no string in the Trie has this prefix
-
-            if not node.children.get(a):
-                key = key[0:i]
-                self.suggestionsRec(node,key)
-                return 0
-
-
-            node = node.children[a]
-            i +=1
-
-        # If prefix is present as a word, but
-        # there is no subtree below the last
-        # matching node.
-        if not node.children:
-            return -1
-
-        self.suggestionsRec(node,key)
+        self.printMST(parent)
 
 
+# Driver's code
+if __name__ == '__main__':
+    g = Graph(5)
+    g.graph = [[0, 2, 0, 6, 0],
+               [2, 0, 3, 8, 5],
+               [0, 3, 0, 0, 7],
+               [6, 8, 0, 0, 9],
+               [0, 5, 7, 9, 0]]
 
-        return 1
-
-
-    def check_spell(self,node,word):
-        if node.children.values() == " ":
-            return word
-
-        for a, n in node.children.items():
-
-            self.check_spell(n, word + a)
-
-
-# Driver Code
-keys = ["Nguyễn Văn Cừ, phuong 5, quan 1", "Trần Hưng Đạo, p4, q1", "Nguyễn Thị Thập, p5, quận 7"
-      , "Đại Học Kinh Tế", "Đại Học Bách Khoa", "Đại Học FPT, Lô E2a-7, Đường D1, Đ. D1, Long Thạnh Mỹ, Thành Phố Thủ Đức, Thành phố Hồ Chí Minh 700000"]  # keys to form the trie structure.
-
-
-t = Trie()
-
-# creating the trie structure with the
-# given set of strings.
-
-t.formTrie(keys)
-
-
-key = "b"
-while key != "a":
-    key = input("Enter: ")
-    comp = t.printAutoSuggestions(key)
-
-
-# creating trie object
-
-# autocompleting the given key using
-# our trie structure.
-
-
-
-
-
-# This code is contributed by amurdia and muhammedrijnas
+    g.primMST()
